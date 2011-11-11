@@ -29,6 +29,9 @@ app.configure(function () {
 app.configure('development', function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   app.use(express.logger());
+  app.all('/debug', function (req, res) {
+    res.send(util.inspect(req));
+  });
 });
 
 app.configure('production', function () {
@@ -73,34 +76,9 @@ app.dynamicHelpers({
   },
 });
 
-// Routes
-
-app.get('/', function (req, res) {
-  if (req.session.userinfo) {
-    // When logged in, display a dashboard of information.
-    require('./appman').getAllByUser(req.session.userinfo.username, function (apps) {
-      res.render('dashboard', {
-        locals: {
-          title: messages.get('my-dashboard'),
-          userinfo: req.session.userinfo,
-          apps: apps
-        }
-      });
-    });
-  } else {
-    res.redirect('/login');
-  };
-});
-
-app.all('/test', function (req, res) {
-  res.send(util.inspect(req));
-});app.all('/post',function(req,res){res.send('<form method="POST" action="/post"><div class="flash block-flash info-flash"><div class="message">Are you sure you want to authenticate the application <a href="/apps/U0M1TEIJKiBAhv0LCHFvwgpA_fk" target="_blank"><strong>._.</strong></a>? If you do, <strong>._.</strong> will have access to your personal data.</div><div class="choices"><input type="submit" name="yes" value="Yes"/><input type="submit" name="no" value="No" class="normal-button"/></div></div></form>'+util.inspect(req)+'</pre>');});
-
 // Only listen on $ node app.js
 
 if (!module.parent) {
   app.listen(3000);
   console.log("Express server listening on port %d", app.address().port);
 }
-
-/* vim: set ts=2 sw=2 nocin si: */
